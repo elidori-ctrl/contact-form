@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>השאר פרטים</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+      padding: 48px 40px 40px;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      color: #1a202c;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    p.sub {
+      color: #718096;
+      font-size: 0.95rem;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #2d3748;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #2d3748;
+      transition: border-color 0.2s;
+      margin-bottom: 20px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.15);
+    }
+
+    button {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    button:hover { opacity: 0.92; }
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.6; cursor: default; }
+
+    .msg {
+      margin-top: 20px;
+      padding: 14px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 0.95rem;
+      display: none;
+    }
+
+    .msg.success { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+    .msg.error   { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>השאר פרטים</h1>
+    <p class="sub">נחזור אליך בהקדם</p>
+
+    <form id="contactForm">
+      <label for="name">שם מלא</label>
+      <input type="text" id="name" name="name" placeholder="ישראל ישראלי" required />
+
+      <label for="phone">מספר טלפון</label>
+      <input type="tel" id="phone" name="phone" placeholder="05X-XXXXXXX" required />
+
+      <button type="submit" id="submitBtn">שלח</button>
+    </form>
+
+    <div class="msg" id="msg"></div>
+  </div>
+
+  <script>
+    const APPS_SCRIPT_URL = "YOUR_APPS_SCRIPT_URL_HERE";
+
+    document.getElementById("contactForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const btn = document.getElementById("submitBtn");
+      const msg = document.getElementById("msg");
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      btn.disabled = true;
+      btn.textContent = "שולח...";
+      msg.style.display = "none";
+
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, phone, timestamp: new Date().toLocaleString("he-IL") })
+        });
+
+        msg.className = "msg success";
+        msg.textContent = "הפרטים נשלחו! תודה, ניצור איתך קשר בקרוב.";
+        msg.style.display = "block";
+        e.target.reset();
+      } catch (err) {
+        msg.className = "msg error";
+        msg.textContent = "שגיאה בשליחה, נסה שוב.";
+        msg.style.display = "block";
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "שלח";
+      }
+    });
+  </script>
+</body>
+</html>
